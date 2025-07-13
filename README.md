@@ -402,4 +402,4 @@ npm run setup-db
 
 ---
 
-**Built with ❤️ by the Order Matching System Team**
+**Built by Rishabh Bhansali**
