@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: order_matching_db
+    environment:
+      POSTGRES_DB: order_matching_system
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/setup-database.js:/docker-entrypoint-initdb.d/setup-database.js
+    ports:
+      - "5432:5432"
+    networks:
+      - order_matching_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Order Matching System Backend
+  backend:
+    build: .
+    container_name: order_matching_backend
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: order_matching_system
+      DB_USER: postgres
+      DB_PASSWORD: password
+      FRONTEND_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - order_matching_network
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend (Optional - can be served by backend)
+  frontend:
+    image: nginx:alpine
+    container_name: order_matching_frontend
+    ports:
+      - "3001:80"
+    volumes:
+      - ./frontend/build:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - backend
+    networks:
+      - order_matching_network
+    restart: unless-stopped
+
+  # Redis for caching (Optional)
+  redis:
+    image: redis:7-alpine
+    container_name: order_matching_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - order_matching_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  order_matching_network:
+    driver: bridge 

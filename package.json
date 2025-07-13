@@ -1,0 +1,41 @@
+{
+  "name": "order-matching-system",
+  "version": "1.0.0",
+  "description": "A comprehensive order matching system with encryption and mobile support",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "set PORT=5000 && node backend/server.js",
+    "dev": "set PORT=5000 && nodemon backend/server.js",
+    "frontend": "cd frontend && npm start",
+    "mobile": "cd mobile && npm start",
+    "install-all": "npm install && cd frontend && npm install && cd ../mobile && npm install",
+    "setup-db": "node backend/setup-database.js"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "node-rsa": "^1.1.1",
+    "sqlite3": "^5.1.7",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": [
+    "order-matching",
+    "trading",
+    "encryption",
+    "nodejs",
+    "react"
+  ],
+  "author": "Order Matching System Team",
+  "license": "MIT"
+}
